@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Post {{ post_id }}</title>
+</head>
+<body>
+  <h1>Post #{{ post_id }}</h1>
+  <div>{{ content|safe }}</div>
+  <a href="{{ url_for('index') }}">← 戻る</a>
+</body>
+</html>

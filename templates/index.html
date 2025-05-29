@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask + SQLite Example</title>
+    <style>
+        .post {
+            border: 1px solid black;  /* 黒い枠線 */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;        /* （任意）角を少し丸くする */
+            background-color: #fff9c4;  /* 薄い黄色（明るいレモン色） */
+        }
+    </style>
+</head>
+<body>
+    <h1>Flask + SQLite Example</h1>
+<form id="mdForm">
+    <textarea name="content" id="content" required></textarea>
+    <button type="submit">追加</button>
+</form>
+<div id="posts"></div>
+    <script>
+async function reloadPosts() {
+    const response = await fetch('/getPosts');
+    const posts = await response.json();
+
+    const postsDiv = document.getElementById('posts');
+    postsDiv.innerHTML = '';  // 投稿一覧をクリア
+
+    for (const post of posts) {
+        const div = document.createElement('div');
+        div.classList.add('post');
+        div.dataset.id = post.id;
+
+        // 固有リンクを表示
+        const link = document.createElement('a');
+        link.href = `/post/${post.id}`;
+        link.textContent = `ポスト #${post.id}`;
+        link.style.display = 'block';
+
+        div.appendChild(link);
+
+        // 本文を追加
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = post.html;
+        div.appendChild(contentDiv);
+
+        postsDiv.appendChild(div);
+    }
+}
+
+        // ページ読み込み時に実行
+        document.addEventListener('DOMContentLoaded', () => {
+                    reloadPosts();
+                });
+// async function reloadPosts() {
+//     const response = await fetch('/getPosts');
+//     const posts = await response.json();
+
+//     const postsDiv = document.getElementById('posts');
+//     postsDiv.innerHTML = '';  // 既存をクリア
+//     for (const post of posts) {
+//         const div = document.createElement('div');
+//         div.classList.add('post');
+//         div.dataset.id = post.id;
+//         div.innerHTML = post.html;
+//         postsDiv.appendChild(div);
+//     }
+// }
+document.getElementById('mdForm').addEventListener('submit', async function(e) {
+    e.preventDefault();  // ページリロード防止
+
+    const content = document.getElementById('content').value;
+    const formData = new FormData();
+    formData.append('content', content);
+
+    const response = await fetch('/addMD', {
+        method: 'POST',
+        body: formData
+    });
+
+    const result = await response.json();
+    if (result.status === 'ok') {
+    await reloadPosts();
+document.getElementById('content').value = '';  // テキストエリアクリア
+    } else {
+        alert('投稿に失敗しました。');
+    }
+});
+    </script>
+</body>
+</html>
